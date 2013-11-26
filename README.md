@@ -22,6 +22,8 @@ Installation
 Example
 ========
 
+First thing first make a new file(inside the repos dir) called ```download.py```with the following contents:
+
 ```py
 #! /usr/bin/env python
 #-*- coding: utf-8 -*-
@@ -46,3 +48,4 @@ t = Tutsplus(username, password)
 t.download_courses(courses_url)
 ```
 
+run with ```python download.py```
