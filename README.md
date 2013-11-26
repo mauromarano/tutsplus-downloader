@@ -16,7 +16,7 @@ Installation
 =============
 
 1. Clone this repository
-2. pip install -r requirements.txt
+2. Install depencies with ```pip install -r requirements.txt``
 
 
 Example
@@ -26,13 +26,23 @@ Example
 #! /usr/bin/env python
 #-*- coding: utf-8 -*-
 
+# Importing the module
 from Tutsplus import Tutsplus
 
+# Your username and password
 username = 'my_username'
 password = 'my_password'
-courses_url = ['https://tutsplus.com/course/say-yo-to-yeoman/',
-                'https://tutsplus.com/course/phone-gap-essentials/' ]
 
+# This is a list with all the url for the courses you want to download
+courses_url = [
+                'https://tutsplus.com/course/say-yo-to-yeoman/',
+                'https://tutsplus.com/course/phone-gap-essentials/'
+            ]
+
+# Instantiate the main object passing the credentials
 t = Tutsplus(username, password)
+
+# This method will download all the courses within the list
 t.download_courses(courses_url)
 ```
+
