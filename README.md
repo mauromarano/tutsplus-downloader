@@ -16,7 +16,7 @@ Installation
 =============
 
 1. Clone this repository
-2. Install depencies with ```pip install -r requirements.txt``
+2. Install depencies with ```pip install -r requirements.txt```
 
 
 Example
