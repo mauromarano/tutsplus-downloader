@@ -22,7 +22,8 @@ Installation
 Example
 ========
 
-```#! /usr/bin/env python
+```
+#! /usr/bin/env python
 #-*- coding: utf-8 -*-
 
 from Tutsplus import Tutsplus
@@ -33,4 +34,5 @@ courses_url = ['https://tutsplus.com/course/say-yo-to-yeoman/',
                 'https://tutsplus.com/course/phone-gap-essentials/' ]
 
 t = Tutsplus(username, password)
-t.download_courses(courses_url)```
+t.download_courses(courses_url)
+´´´
