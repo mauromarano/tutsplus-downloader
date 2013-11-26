@@ -35,8 +35,6 @@ class Tutsplus:
             'login_attempt_id' : login_attempt_id
         }
 
-        print data
-
         self.s.post(self.login_url, data = data)
         return True
 
@@ -58,6 +56,7 @@ class Tutsplus:
         course_info = self.get_info_from_course(soup)
 
         for video in course_info:
+            print "[+] Downloading " + video['titolo']
             self.download_video(video)
             self.video_number = self.video_number + 1
 
@@ -124,3 +123,4 @@ class Tutsplus:
                 arr.append(info)
 
         return arr
+
