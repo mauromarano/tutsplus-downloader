@@ -37,7 +37,7 @@ class Tutsplus:
 
         print data
 
-        r = self.s.post(self.login_url, data = data)
+        self.s.post(self.login_url, data = data)
         return True
 
     # Download all video from a course url
@@ -58,7 +58,6 @@ class Tutsplus:
         course_info = self.get_info_from_course(soup)
 
         for video in course_info:
-            print "[+] Downloading " + video['titolo']
             self.download_video(video)
             self.video_number = self.video_number + 1
 
