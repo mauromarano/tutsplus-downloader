@@ -22,7 +22,7 @@ Installation
 Example
 ========
 
-```
+```py
 #! /usr/bin/env python
 #-*- coding: utf-8 -*-
 
