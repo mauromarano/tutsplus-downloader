@@ -50,7 +50,8 @@ class Tutsplus:
 
         # the course's name
         self.course_title = soup.select('.title-text')[0].string
-        os.makedirs(self.course_title)
+        if not os.path.exists(self.course_title) :
+            os.makedirs(self.course_title)
 
         # array who stores the information about a course
         course_info = self.get_info_from_course(soup)
@@ -88,9 +89,8 @@ class Tutsplus:
             download_link = download_link[1]
 
         # String name of the file
-        name = self.course_title + '/[' + str(self.video_number) + '] ' + lesson['titolo']
+        name = self.course_title + '/[' + str(self.video_number) + '] ' + lesson['titolo'].replace('/','-')
         self.download_file(download_link['href'],name)
-
         print '[*] Downloaded > ' + lesson['titolo']
 
     # Function who downloads the file itself
@@ -99,11 +99,12 @@ class Tutsplus:
         # NOTE the stream=True parameter
         name = name + '.mp4'
         r = self.s.get(url, stream=True)
-        with open(name, 'wb') as f:
-            for chunk in r.iter_content(chunk_size=1024):
-                if chunk: # filter out keep-alive new chunks
-                    f.write(chunk)
-                    f.flush()
+        if not os.path.isfile(name) :
+            with open(name, 'wb') as f:
+                for chunk in r.iter_content(chunk_size=1024):
+                    if chunk: # filter out keep-alive new chunks
+                        f.write(chunk)
+                        f.flush()
         return name
 
     # return an array with all the information about a video (title, url)
