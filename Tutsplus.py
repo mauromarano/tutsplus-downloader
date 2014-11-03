@@ -8,6 +8,7 @@ import os
 class Tutsplus:
 
     login_url= 'https://tutsplus.com/sign_in'
+    login_post = 'https://tutsplus.com/sessions'
     home_url = 'https://tutsplus.com'
 
     def __init__(self, username, password):
@@ -27,16 +28,15 @@ class Tutsplus:
     def login(self):
         self.s = requests.session()
         soup = BeautifulSoup(self.get_source(self.login_url))
-        login_attempt_id =  soup.find_all(attrs={"name": "login_attempt_id"})[0]['value']
 
         data = {
-            "amember_login":self.username,
-            "amember_pass":self.password,
-            "remember_login":1,
-            'login_attempt_id' : login_attempt_id
+            "session[login]":self.username,
+            "session[password]":self.password,
+            "authenticity_token": soup.find(attrs={"name":"csrf-token"})['content'],
+            "utf8":"✓"
         }
 
-        self.s.post(self.login_url, data = data)
+        self.s.post(self.login_post, data = data)
         return True
 
     # Download all video from a course url
@@ -59,7 +59,7 @@ class Tutsplus:
 
         for video in course_info:
             print "[+] Downloading " + video['titolo']
-            name = self.course_title + '/[' + str(self.video_number) + '] ' + lesson['titolo']
+            name = self.course_title + '/[' + str(self.video_number) + '] ' + video['titolo']
             self.download_file(video['link'],name)
             self.video_number = self.video_number + 1
 
