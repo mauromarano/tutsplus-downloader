@@ -59,7 +59,8 @@ class Tutsplus:
 
         for video in course_info:
             print "[+] Downloading " + video['titolo']
-            self.download_video(video)
+            name = self.course_title + '/[' + str(self.video_number) + '] ' + lesson['titolo']
+            self.download_file(video['link'],name)
             self.video_number = self.video_number + 1
 
 
@@ -74,26 +75,7 @@ class Tutsplus:
     #   "titolo": 'video title',
     #   "link" : 'http://link_to_download'
     # }
-    def download_video(self,lesson):
-
-        source = self.get_source(lesson['link'])
-
-        soup = BeautifulSoup(source)
-
-        download_link= soup.select('.post-buttons > a')
-
-        # If it finds more than 1 download link it will skip
-        # the video files and will download the video only
-        if len(download_link) == 1:
-            download_link = download_link[0]
-        else:
-            download_link = download_link[1]
-
-        # String name of the file
-        name = self.course_title + '/[' + str(self.video_number) + '] ' + lesson['titolo'].replace('/','-')
-        self.download_file(download_link['href'],name)
-        print '[*] Downloaded > ' + lesson['titolo']
-
+   
     # Function who downloads the file itself
     def download_file(self,url, name):
         # name = url.split('/')[-1]
