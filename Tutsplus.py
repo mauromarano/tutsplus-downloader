@@ -8,6 +8,7 @@ import os
 class Tutsplus:
 
     login_url= 'https://tutsplus.com/amember/login.php'
+    home_url = 'https://tutsplus.com'
 
     def __init__(self, username, password):
 
@@ -110,18 +111,18 @@ class Tutsplus:
     # return an array with all the information about a video (title, url)
     def get_info_from_course(self, soup):
         arr = []
-        videos = soup.select('.section-title > a')
+        videos = soup.select('.lesson-index__lesson')
 
         for video in videos:
-            if video.string is not None:
-                titolo = video.string
-                link = video['href']
+            
+            titolo = video.select('.lesson-index__lesson-title')[0].string
+            link = video.select('a')[0]['href']
 
-                info = {
-                    "titolo":titolo,
-                    "link":link
-                }
-                arr.append(info)
+            info = {
+                "titolo":titolo,
+                "link":self.home_url+link
+            }
+            arr.append(info)
 
         return arr
 
