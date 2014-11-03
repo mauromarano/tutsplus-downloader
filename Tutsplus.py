@@ -49,7 +49,7 @@ class Tutsplus:
         soup = BeautifulSoup(source)
 
         # the course's name
-        self.course_title = soup.select('.title-text')[0].string
+        self.course_title = soup.select('h1')[0].string
         if not os.path.exists(self.course_title) :
             os.makedirs(self.course_title)
 
