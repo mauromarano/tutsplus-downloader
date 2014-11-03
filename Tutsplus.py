@@ -7,7 +7,7 @@ import os
 
 class Tutsplus:
 
-    login_url= 'https://tutsplus.com/amember/login.php'
+    login_url= 'https://tutsplus.com/sign_in'
     home_url = 'https://tutsplus.com'
 
     def __init__(self, username, password):
