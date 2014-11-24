@@ -59,7 +59,7 @@ class Tutsplus:
 
         for video in course_info:
             print "[+] Downloading " + video['titolo']
-            name = self.course_title + '/[' + str(self.video_number) + '] ' + video['titolo']
+            name = self.course_title + '/[' + str(self.video_number).zfill(2) + '] ' + video['titolo']
             self.download_file(video['link'],name)
             self.video_number = self.video_number + 1
 
