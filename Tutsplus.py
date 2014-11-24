@@ -59,7 +59,7 @@ class Tutsplus:
 
         for video in course_info:
             print "[+] Downloading " + video['titolo']
-            name = self.course_title + '/[' + str(self.video_number) + '] ' + video['titolo']
+            name = self.course_title + '/[' + str(self.video_number).zfill(2) + '] ' + video['titolo'] + video['ext']
             self.download_file(video['link'],name)
             self.video_number = self.video_number + 1
 
@@ -75,9 +75,9 @@ class Tutsplus:
     #   "titolo": 'video title',
     #   "link" : 'http://link_to_download'
     # }
-   
+
     # Function who downloads the file itself
-    def download_file(self,url, name):
+    def download_file(self, url, name):
         # name = url.split('/')[-1]
         # NOTE the stream=True parameter
         name = name + '.mp4'
@@ -96,15 +96,24 @@ class Tutsplus:
         videos = soup.select('.lesson-index__lesson')
 
         for video in videos:
-            
+
             titolo = video.select('.lesson-index__lesson-title')[0].string
             link = video.select('a')[0]['href']
 
             info = {
                 "titolo":titolo,
-                "link":self.home_url+link
+                "link":link,
+                "ext":'.mp4'
             }
             arr.append(info)
+
+        sourcefile = soup.select('.course-actions__download-button')
+        if sourcefile:
+            arr.append({
+                "titolo":'Sourcefiles',
+                "link":sourcefile[0]['href'],
+                "ext":'.zip'
+            })
 
         return arr
 
