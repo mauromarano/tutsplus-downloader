@@ -75,7 +75,7 @@ class Tutsplus:
     #   "titolo": 'video title',
     #   "link" : 'http://link_to_download'
     # }
-   
+
     # Function who downloads the file itself
     def download_file(self,url, name):
         # name = url.split('/')[-1]
@@ -96,13 +96,13 @@ class Tutsplus:
         videos = soup.select('.lesson-index__lesson')
 
         for video in videos:
-            
+
             titolo = video.select('.lesson-index__lesson-title')[0].string
             link = video.select('a')[0]['href']
 
             info = {
                 "titolo":titolo,
-                "link":self.home_url+link
+                "link":link,
             }
             arr.append(info)
 
