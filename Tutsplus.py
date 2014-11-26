@@ -47,7 +47,7 @@ class Tutsplus:
         self.token = soup.find(attrs={"name":"csrf-token"})['content']
 
         # the course's name
-        course_title = soup.select('h1')[0].string
+        course_title = soup.select('h1')[0].string.replace('/','-')
         print "######### " + course_title + " #########"
         if not os.path.exists(course_title) :
             os.makedirs(course_title)
@@ -65,7 +65,7 @@ class Tutsplus:
 
         for video in course_info:
             print "[+] Downloading " + video['titolo']
-            filename = course_title + '/[' + str(video_number).zfill(2) + '] ' + video['titolo'] + '.mp4'
+            filename = course_title + '/[' + str(video_number).zfill(2) + '] ' + video['titolo'].replace('/','-') + '.mp4'
             self.download_video(video['link'], filename)
             video_number = video_number + 1
 
