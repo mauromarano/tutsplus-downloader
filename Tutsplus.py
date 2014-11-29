@@ -64,7 +64,7 @@ class Tutsplus:
         course_info = self.get_info_from_course(soup)
 
         for video in course_info:
-            print "[+] Downloading " + video['titolo']
+            print "[+] Downloading " + video['titolo'].encode("utf-8")
             filename = course_title + '/[' + str(video_number).zfill(2) + '] ' + video['titolo'].replace('/','-') + '.mp4'
             self.download_video(video['link'], filename)
             video_number = video_number + 1
