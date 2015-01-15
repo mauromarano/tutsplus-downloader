@@ -66,7 +66,7 @@ class Tutsplus:
 
         for video in course_info:
             print "[+] Downloading " + video['titolo'].encode("utf-8")
-            filename = course_title + '/[' + str(video_number).zfill(2) + '] ' + re.sub('[^A-Za-z0-9]+', ' ', video['titolo']).replace('/','-') + '.mp4'
+            filename = course_title + '/[' + str(video_number).zfill(2) + '] ' + re.sub('[^A-Za-z0-9\^\&\@\{\}\[\]\,\$\=\!\-\#\(\)\.\%\+\~\_ ]+', ' ', video['titolo']) + '.mp4'
             self.download_video(video['link'], filename)
             video_number = video_number + 1
 
