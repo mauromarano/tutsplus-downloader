@@ -1,4 +1,4 @@
-#! /usr/bin/env python
+#! /usr/pkg/bin/python
 #-*- coding: utf-8 -*-
 
 import requests
@@ -42,8 +42,11 @@ class Tutsplus:
         # Variable needed to increment the video number
         video_number = 1
 
+        # get source
+        source = self.get_source(url)
+
         # update csrf token for each course
-        soup = BeautifulSoup(self.get_source(url))
+        soup = BeautifulSoup(source)
         self.token = soup.find(attrs={"name":"csrf-token"})['content']
 
         # the course's name
@@ -51,6 +54,10 @@ class Tutsplus:
         print "######### " + course_title + " #########"
         if not os.path.exists(course_title) :
             os.makedirs(course_title)
+
+        # store course page
+        with open(course_title + '/course.html', 'w') as fid:
+            fid.write(source)
 
         # if the course includes sourcefiles download them first
         sourcefile = soup.select('.course-actions__download-button')
