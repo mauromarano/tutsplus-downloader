@@ -38,6 +38,10 @@ class Tutsplus:
         self.s.post(self.login_post, data = data)
         return True
 
+    # remove special characters for windows users
+    def sanitize_filename(self, name):
+        return re.sub('[<>:"/\\|?*]+', '', name)
+
     # Download all video from a course url
     def download_course(self, url):
         # Variable needed to increment the video number
@@ -51,7 +55,7 @@ class Tutsplus:
         self.token = soup.find(attrs={"name":"csrf-token"})['content']
 
         # the course's name
-        course_title = soup.select('h1')[0].string.replace('/','-')
+        course_title = self.sanitize_filename(soup.select('h1')[0].string.encode("utf-8"))
         print "######### " + course_title + " #########"
         if not os.path.exists(course_title) :
             os.makedirs(course_title)
@@ -73,7 +77,7 @@ class Tutsplus:
 
         for video in course_info:
             print "[+] Downloading " + video['titolo'].encode("utf-8")
-            filename = course_title + '/[' + str(video_number).zfill(2) + '] ' + re.sub('[[^A-Za-z0-9 ]+, ' ', video['titolo']) + '.mp4'
+            filename = course_title + '/[' + str(video_number).zfill(2) + '] ' + self.sanitize_filename(video['titolo']) + '.mp4'
             self.download_video(video['link'], filename)
             video_number = video_number + 1
 
