@@ -40,7 +40,10 @@ class Tutsplus:
 
     # remove special characters for windows users
     def sanitize_filename(self, name):
-        return re.sub('[<>:"/\\|?*]+', '', name)
+        if os.name  == "nt":
+            return re.sub('[<>:"/\\|?*]+', '', name)
+        else:
+            return name.replace('/','-')
 
     # Download all video from a course url
     def download_course(self, url):
