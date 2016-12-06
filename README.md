@@ -1,3 +1,9 @@
+State of the development
+========================
+This project has not been update since long time. 
+I have no longer a tutsplus premium account, so I cannot update the project to work with the new version of the site.
+I don't plan to buy a premium account anytime soon. That's mean that, as rigth now (6 december 2016), **the project will not be updated**.
+
 This is for paid user only!
 ===========================
 
