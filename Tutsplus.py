@@ -1,127 +1,129 @@
-#! /usr/bin/env python
+#! /usr/pkg/bin/python
 #-*- coding: utf-8 -*-
 
 import requests
 from bs4 import BeautifulSoup
 import os
+import re
 
 class Tutsplus:
 
-    login_url= 'https://tutsplus.com/amember/login.php'
+    login_url= 'https://tutsplus.com/sign_in'
+    login_post = 'https://tutsplus.com/sessions'
+    home_url = 'https://tutsplus.com'
 
     def __init__(self, username, password):
-
         self.username = username
         self.password = password
-
         self.login()
 
     # Return the html source for a specified url
     def get_source(self, url):
-
         r = self.s.get(url)
         return r.content
 
-    # It logs in and store the sesson for the future requests
+    # It logs in and store the session for the future requests
     def login(self):
         self.s = requests.session()
         soup = BeautifulSoup(self.get_source(self.login_url))
-        login_attempt_id =  soup.find_all(attrs={"name": "login_attempt_id"})[0]['value']
+        self.token = soup.find(attrs={"name":"csrf-token"})['content']
 
         data = {
-            "amember_login":self.username,
-            "amember_pass":self.password,
-            "remember_login":1,
-            'login_attempt_id' : login_attempt_id
+            "session[login]": self.username,
+            "session[password]": self.password,
+            "authenticity_token": self.token,
+            "utf8": "✓"
         }
 
-        self.s.post(self.login_url, data = data)
+        self.s.post(self.login_post, data = data)
         return True
+
+    # remove special characters for windows users
+    def sanitize_filename(self, name):
+        if os.name  == "nt":
+            return re.sub('[<>:"/\\|?*]+', '', name)
+        else:
+            return name.replace('/','-')
 
     # Download all video from a course url
     def download_course(self, url):
-
         # Variable needed to increment the video number
-        self.video_number = 1
+        video_number = 1
 
+        # get source
         source = self.get_source(url)
 
+        # update csrf token for each course
         soup = BeautifulSoup(source)
+        self.token = soup.find(attrs={"name":"csrf-token"})['content']
 
         # the course's name
-        self.course_title = soup.select('.title-text')[0].string
-        if not os.path.exists(self.course_title) :
-            os.makedirs(self.course_title)
+        course_title = self.sanitize_filename(soup.select('h1')[0].string.encode("utf-8"))
+        print "######### " + course_title + " #########"
+        if not os.path.exists(course_title) :
+            os.makedirs(course_title)
+
+        # store course page
+        with open(course_title + '/course.html', 'w') as fid:
+            fid.write(source)
+
+        # if the course includes sourcefiles download them first
+        sourcefile = soup.select('.course-actions__download-button')
+        if sourcefile:
+            print "[+] Downloading source files"
+            filename = course_title + '/sources.zip'
+            link = sourcefile[0]['href']
+            self.download_file(link, filename)
 
         # array who stores the information about a course
         course_info = self.get_info_from_course(soup)
 
         for video in course_info:
-            print "[+] Downloading " + video['titolo']
-            self.download_video(video)
-            self.video_number = self.video_number + 1
+            print "[+] Downloading " + video['titolo'].encode("utf-8")
+            filename = course_title + '/[' + str(video_number).zfill(2) + '] ' + self.sanitize_filename(video['titolo']) + '.mp4'
+            self.download_video(video['link'], filename)
+            video_number = video_number + 1
 
 
-    def download_courses(self,courses):
-
+    def download_courses(self, courses):
         for course in courses:
-
             self.download_course(course)
 
-    # pass in the info of the lesson and it will download the video
-    # lesson = {
-    #   "titolo": 'video title',
-    #   "link" : 'http://link_to_download'
-    # }
-    def download_video(self,lesson):
-
-        source = self.get_source(lesson['link'])
-
-        soup = BeautifulSoup(source)
-
-        download_link= soup.select('.post-buttons > a')
-
-        # If it finds more than 1 download link it will skip
-        # the video files and will download the video only
-        if len(download_link) == 1:
-            download_link = download_link[0]
-        else:
-            download_link = download_link[1]
-
-        # String name of the file
-        name = self.course_title + '/[' + str(self.video_number) + '] ' + lesson['titolo'].replace('/','-')
-        self.download_file(download_link['href'],name)
-        print '[*] Downloaded > ' + lesson['titolo']
+    def download_video(self, url, filename):
+        # the trick for video links is not to follow the redirect, but to fetch the download link manually
+        # otherwise we'll get an SignatureDoesNotMatch error from S3
+        data = {
+            "authenticity_token": self.token,
+            "_method": 'post'
+        }
+        soup = BeautifulSoup(self.s.post(url, data = data, allow_redirects=False).content)
+        url = soup.find_all('a')[0]['href']
+        self.download_file(url, filename)
 
     # Function who downloads the file itself
-    def download_file(self,url, name):
-        # name = url.split('/')[-1]
-        # NOTE the stream=True parameter
-        name = name + '.mp4'
+    def download_file(self, url, filename):
         r = self.s.get(url, stream=True)
-        if not os.path.isfile(name) :
-            with open(name, 'wb') as f:
+        if not os.path.isfile(filename) :
+            with open(filename, 'wb') as f:
                 for chunk in r.iter_content(chunk_size=1024):
                     if chunk: # filter out keep-alive new chunks
                         f.write(chunk)
                         f.flush()
-        return name
 
     # return an array with all the information about a video (title, url)
     def get_info_from_course(self, soup):
         arr = []
-        videos = soup.select('.section-title > a')
+        videos = soup.select('.lesson-index__lesson')
 
         for video in videos:
-            if video.string is not None:
-                titolo = video.string
-                link = video['href']
 
-                info = {
-                    "titolo":titolo,
-                    "link":link
-                }
-                arr.append(info)
+            titolo = video.select('.lesson-index__lesson-title')[0].string
+            link = video.select('a')[0]['href']
+
+            info = {
+                "titolo": titolo,
+                "link": link,
+            }
+            arr.append(info)
 
         return arr
-
